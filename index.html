@@ -1,0 +1,85 @@
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="">
+	<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/status.css">
+</head>
+<body ng-app="trendyStatus">
+	<div class="top container">
+		<div class="right login-box">
+		    <form class="navbar-form navbar-right" role="search">
+		        <div class="form-group">
+		            <input type="text" class="form-control" name="username" placeholder="Username">
+		        </div>
+		        <div class="form-group">
+		            <input type="text" class="form-control" name="password" placeholder="Password">
+		        </div>
+		        <button type="submit" class="btn btn-default">Sign In</button>
+		    </form>
+		</div>
+	</div>
+		<div class="content container" ng-controller="statusController">
+			<section class="status-section">
+				<article ng-repeat="status in statusList" class="status-item center-block">
+					<div class="mask">
+						<button ng-click='removeStatus(status)' class="btn-warning">Delete</button>
+						<button ng-click='testStatus(status)' class="btn-info">Test</button>
+						<div>
+							<p>Description: {{status.meta.description}}</p>
+							<select ng-model='testAtt' ng-options="visibility for availability in availability">
+
+							</select>
+						</div>
+					</div>
+					<div class="status-info pull-left">
+						<label name="name-label">Name:</label>
+						<span>{{status.name}}</span>
+						<label name="url-label">URL:</label>
+						<span>{{status.url}}</span>
+					</div>
+					<div class='status-{{status.status}} pull-right'>
+					</div>
+
+					<div class="clearfix"></div>
+				</article>
+				<article class="edit status-item center-block hide">
+					<form name="addStatus" class="new-status" ng-submit="addNewStatus()">
+						<div class="status-info	edit-labels">
+							<label name="name-label">Name:</label>
+							<input name="status-name" ng-model="newStatus.newStatusName">
+							<label name="url-label">URL:</label>
+							<input name="status-url" ng-model="newStatus.newStatusUrl">
+						</div>
+						<div class="status-info edit-buttons">
+							<button name="save" type="submit" class="btn-success">Save</button>
+						</div>
+						<div class="clearfix"></div>
+					</form>					
+					
+				</article>
+			</section>
+			
+		</div>
+		<div class="bottom container">
+
+			<div class="footer">
+
+
+
+
+			</div>
+		</div>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.4/angular.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.3/angular-route.js"></script>
+	<script type="text/javascript" src="./js/status.js"></script>
+	<script type="text/javascript">
+	$('<div class="add-status"></div>').insertAfter('article:last-child');
+	$('.add-status').click(function(){
+		$('.edit').toggleClass('hide');
+	})
+	</script>
+</body>
+</html>
