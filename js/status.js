@@ -81,9 +81,11 @@ var status = angular.module('trendyStatus', [])
 
 
 		this.check = function(status){
+			console.log(status.url);
 			$http.get(status.url)
 				.success(function(data, info){
 					console.log(info);
+					console.log(data);
 					status.status = 'success';
 				})
 				.error(function(data, info){
@@ -105,9 +107,13 @@ var status = angular.module('trendyStatus', [])
 	  $scope.statusList = statusList.get();
 	  $scope.newStatus = {
 	  	newStatusName: "Status Name",
-	  	newStatusUrl: "Status URL"
+	  	newStatusUrl: "Status URL",
+	  	availability: ['public', 'private'],
+	  	defaultAvailability: $scope.newStatus.availability[0]
 	  };
 	  $scope.availability = ['public', 'private'];
+
+	  $scope.selectModel = $scope.availability[0];
 
 	  $scope.addNewStatus = function(){
 	  	var status = {
@@ -117,8 +123,8 @@ var status = angular.module('trendyStatus', [])
 	  		status: 'warning',
 	  		meta: {
 	  			code: null,
-	  			description: null,
-	  			visibility: $scope.availability[0]
+	  			description: "sdfusdhfasdf;kashdf;asdf s ;dfuhas;dfuhas;dfuhasd fasd ;fasdhfa;sdhfas ;dfh",
+	  			visibility: $scope.availability
 	  		},
 
 	  	}
@@ -127,6 +133,7 @@ var status = angular.module('trendyStatus', [])
 
 	  $scope.removeStatus = function(status){
 	  	console.log(status);
+	  	//use promise / then
 	  	if(statusList.remove(status) == 0){
 		  	var index = $scope.statusList.indexOf(status);
 		  	if (index > -1) {

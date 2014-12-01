@@ -74,9 +74,19 @@ article{
 }
 
 
+.mask-element{
+	max-width: 32%;
+	min-width: 25%;
+}
+
+.mask-info p{
+	color: #d3d3d3;
+}
+
 
 .status-info{
 	margin: 2% 0;
+
 }
 
 .status-success{

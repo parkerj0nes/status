@@ -23,14 +23,19 @@
 			<section class="status-section">
 				<article ng-repeat="status in statusList" class="status-item center-block">
 					<div class="mask">
-						<button ng-click='removeStatus(status)' class="btn-warning">Delete</button>
-						<button ng-click='testStatus(status)' class="btn-info">Test</button>
-						<div>
+						<div class="mask-element mask-buttons pull-left">
+							<button ng-click='removeStatus(status)' class="btn-warning">Delete</button>
+							<button ng-click='testStatus(status)' class="btn-info">Test</button>					
+						</div>
+						<div class="mask-element mask-info pull-left">
 							<p>Description: {{status.meta.description}}</p>
-							<select ng-model='testAtt' ng-options="visibility for availability in availability">
+						</div>
+						<div class="mask-element mask-options pull-left">
+							<select ng-model='selectModel' ng-options="visibility for visibility in availability">
 
 							</select>
 						</div>
+						<div class="clearfix"></div>
 					</div>
 					<div class="status-info pull-left">
 						<label name="name-label">Name:</label>
