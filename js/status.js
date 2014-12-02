@@ -1,5 +1,25 @@
 var status = angular.module('trendyStatus', [])
 
+	.constant('AUTH_EVENTS', {
+	  loginSuccess: 'auth-login-success',
+	  loginFailed: 'auth-login-failed',
+	  logoutSuccess: 'auth-logout-success',
+	  sessionTimeout: 'auth-session-timeout',
+	  notAuthenticated: 'auth-not-authenticated',
+	  notAuthorized: 'auth-not-authorized'
+	})	
+
+	.constant('USER_ROLES', {
+	  all: '*',
+	  admin: 'admin',
+	  editor: 'editor',
+	  guest: 'guest'
+	})
+	
+	.factory('AuthService', ['$http', 'Session', function($http, Session){
+
+	}])
+
 	.factory('statusList', [function(){
 		var statusList = [{
 			id: 1,
@@ -109,7 +129,7 @@ var status = angular.module('trendyStatus', [])
 	  	newStatusName: "Status Name",
 	  	newStatusUrl: "Status URL",
 	  	availability: ['public', 'private'],
-	  	defaultAvailability: $scope.newStatus.availability[0]
+	  	// defaultAvailability: $scope.newStatus.availability[0]
 	  };
 	  $scope.availability = ['public', 'private'];
 
