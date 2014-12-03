@@ -120,7 +120,8 @@ var status = angular.module('trendyStatus', [])
 			return status.status;	
 		}
 	}])
-
+	.controller('appController', ['$scope', function($scope){}])
+	.controller('navController', ['$scope', function($scope){}])
 	.controller('statusController', ['$scope', 'statusList', 'statusCheck', function($scope, statusList, statusCheck) {
 	  // $scope.name = 'Hola!';
 
