@@ -1,0 +1,11 @@
+<?php 
+
+require 'DBManager.php';
+
+$db = DbManager::getInstance();
+
+
+
+var_dump($db);
+
+
