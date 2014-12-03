@@ -158,9 +158,11 @@ abstract class BaseModel
      */
     public function update(Array $properties)
     {
+        var_dump($properties);
         foreach ($properties as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->$key = $value;
+                echo "value: " . $key . " , value: " . $value . \n;
             }
         }
         $this->save();

@@ -63,15 +63,22 @@ class Status extends BaseModel{
 
 	}
 
-	public function updateStatus(string $jsonStatus){}
+	public function updateStatus(string $jsonStatus){
+		$statusObj = json_decode($jsonStatus);
+		var_dump($statusObj);
+		$this->update((array)$statusObj);
+
+	}
 
 	public function deleteStatus(){
 		
 		try {	
 			// StatusMeta::getByStatusID($this->ID);
 			$meta = StatusMeta::getByStatusID($this->ID);
-			$meta->delete();
-			$this->delete();
+			if ($meta !== null && ($meta->StatusID === $this->ID ) {
+				$meta->delete();
+				$this->delete();
+			}
 		} catch (Exception $e) {
 			return '{error: "' . $e . '"}';
 		}
@@ -89,9 +96,14 @@ $status = array(
 );
 
 
+$statusUpdate = array(
+	'StatusName' 	=> 'frig off randy',
+	'StatusUrl'		=> 'http://brazzers.com'
+);
+
 $status = Status::createStatus(json_encode($status));
 var_dump($status);
-$status->deleteStatus();
+$status->updateStatus();
 
 // Status::deleteStatus(26009);
 
