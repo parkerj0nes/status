@@ -20,25 +20,19 @@ var status = angular.module('trendyStatus', [])
 
 	}])
 
-	.factory('statusList', [function(){
-		var statusList = [{
-			id: 1,
-			name: "duxter",
-			url: "http://dungeondefenders2.com",
-			status: 'success'
-		},
-		{
-			id: 2,
-			name: "playverse",
-			url: "http://playverse.com",
-			status: 'warning'
-		},
-		{
-			id: 3,
-			name: "playtrics",
-			url: "http://productionmonitoring.playverse.com",
-			status: 'warning'
-		}];
+	.factory('statusList', ['$http', '$q', function($http, $q){
+
+		var statusEndpoint = 'http://localhost/status/api/';
+
+		function getStatusList(){
+			return $http({
+				method: 'GET',
+				url: statusEndpoint + "statuses",
+				headers: {
+					'AuthToken' : 'Token dicks'
+				}
+			})
+		}
 
 		function IDGenerator() {
 	 		var obj = {};
@@ -80,16 +74,13 @@ var status = angular.module('trendyStatus', [])
 			return 0;
 		}
 
-		function getStatus () {
-			return statusList;
-		}
 
 		var generator = IDGenerator();
 		return {
 			add: addStatus,
 			update: updateStatus,
 			remove: removeStatus,
-			get: getStatus,
+			get: getStatusList,
 			idGenerator: generator
 		}
 
@@ -102,22 +93,13 @@ var status = angular.module('trendyStatus', [])
 
 		this.check = function(status){
 			console.log(status.url);
-			$http.get(status.url)
-				.success(function(data, info){
-					console.log(info);
-					console.log(data);
-					status.status = 'success';
-				})
-				.error(function(data, info){
-					console.log(info);
-					if (info == 404) {
-						status.status = 'warning';	
-					} else{
-						status.status = 'fail';
-					};
-					
-				})
-			return status.status;	
+			return $http({
+				method: 'GET',
+				url: status.StatusUrl,
+				headers: {
+					'AuthToken' : 'Token dicks'
+				}
+			})	
 		}
 	}])
 	.controller('appController', ['$scope', function($scope){}])
@@ -125,7 +107,19 @@ var status = angular.module('trendyStatus', [])
 	.controller('statusController', ['$scope', 'statusList', 'statusCheck', function($scope, statusList, statusCheck) {
 	  // $scope.name = 'Hola!';
 
-	  $scope.statusList = statusList.get();
+	  $scope.statusList = [
+	  	{
+	  		id: 1, 
+	  		StatusName: "default",
+	  		StatusUrl: "www.com"
+	  	}
+	  ];
+
+	  statusList.get().then(function(response){
+	  	console.log(response.data);
+	  	$scope.statusList = response.data;
+	  });
+
 	  $scope.newStatus = {
 	  	newStatusName: "Status Name",
 	  	newStatusUrl: "Status URL",
@@ -165,8 +159,12 @@ var status = angular.module('trendyStatus', [])
 	  }
 
 	  $scope.testStatus = function(status){
-	  	console.log('send status ping: ' + status.url);
-	  	status.status = statusCheck.check(status);
+	  	console.log('send status ping: ' + status.StatusUrl);
+	  	statusCheck.check(status).then(function(result){
+	  		console.log(result);
+	  	}, function(error){
+	  		console.log(error.config);
+	  	});
 	  }
 
 	}]);

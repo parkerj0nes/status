@@ -24,8 +24,9 @@
 				<article ng-repeat="status in statusList" class="status-item center-block">
 					<div class="mask">
 						<div class="mask-element mask-buttons pull-left">
-							<button ng-click='removeStatus(status)' class="btn-warning">Delete</button>
-							<button ng-click='testStatus(status)' class="btn-info">Test</button>					
+							<button ng-click='removeStatus(status)' class="btn btn-warning">Delete</button>
+							<button ng-click='testStatus(status)' class="btn btn-info">Test</button>
+							<button ng-click='editStatus(status)' type="button" class="btn btn-success">Edit Button</button>					
 						</div>
 						<div class="mask-element mask-info pull-left">
 							<p>Description: {{status.meta.description}}</p>
@@ -39,9 +40,9 @@
 					</div>
 					<div class="status-info pull-left">
 						<label name="name-label">Name:</label>
-						<span>{{status.name}}</span>
+						<span>{{status.StatusName}}</span>
 						<label name="url-label">URL:</label>
-						<span>{{status.url}}</span>
+						<span>{{status.StatusUrl}}</span>
 					</div>
 					<div class='status-{{status.status}} pull-right'>
 					</div>

@@ -1,8 +1,5 @@
 <?php 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
-namespace Trendy;
 require 'BaseModel.php';
 
 
@@ -32,7 +29,6 @@ class StatusMeta extends BaseModel{
 	}
 
 }
-
 
 class Status extends BaseModel{
 
@@ -94,29 +90,3 @@ class Status extends BaseModel{
 
 
 }
-
-
-$status = array(
-	'ID' 			=> rand(),
-	'StatusName' 	=> '',
-	'StatusUrl'		=> ''
-);
-
-
-$statusUpdate = array
-(	'StatusName' 	=> 'frig off randy',
-	'StatusUrl'		=> 'http://brazzers.com'
-);
-
-$status = Status::createStatus(json_encode($status));
-$status->updateStatus(json_encode($statusUpdate));
-
-var_dump($status);
-echo '<pre>';
-print_r(Status::getAll());
-
-// Status::deleteStatus(26009);
-
-// var_dump($model::create($status));
-
-// var_dump(json_encode($model::getAll()));

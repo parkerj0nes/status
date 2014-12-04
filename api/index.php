@@ -1,18 +1,31 @@
 <?php
 require __DIR__.'/vendor/autoload.php';
+require __DIR__.'/vendor/Trendy/Status.php';
 $app = new \Slim\Slim();
-use \Trendy\StatusModel_Status as Status;
 
 $app->get('/', function(){
-	echo 'success';
+	echo 'welcome to the status api';
+
 });
 
-$app->get('/status/all', function(){
+$app->get('/statuses', function(){
 	echo json_encode(Status::getAll());
-}); // Using Get HTTP Method and process getUsers function
-// $app->get('/status/:id',    'getUser'); // Using Get HTTP Method and process getUser function
-// $app->get('/status/search/:query', 'findByName'); // Using Get HTTP Method and process findByName function
-// $app->post('/status', 'addUser'); // Using Post HTTP Method and process addUser function
-// $app->put('/status/:id', 'updateUser'); // Using Put HTTP Method and process updateUser function
-// $app->delete('/status/:id',    'deleteUser'); // Using Delete HTTP Method and process deleteUser function
+});
+
+$app->get('/status/:id', function($id) use ($app){
+	echo json_encode(Status::get($id));
+}); 
+$app->get('/status/search/:query', function(){
+	echo '{"message": "not yet implemented"}';
+}); 
+
+$app->post('/status', function() use ($app){
+	echo '{"message": "not yet implemented"}';
+}); 
+$app->put('/status/:id', function() use ($app){
+	echo '{"message": "not yet implemented"}';
+});
+$app->delete('/status/:id', function() use ($app){
+	echo '{"message": "not yet implemented"}';
+});
 $app->run();

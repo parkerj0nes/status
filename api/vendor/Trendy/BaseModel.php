@@ -1,5 +1,5 @@
 <?php
-namespace Trendy;
+
 require 'DBManager.php';
 $db = DBManager::getInstance();
 
