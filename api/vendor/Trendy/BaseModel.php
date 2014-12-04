@@ -1,5 +1,5 @@
 <?php
-
+namespace Trendy;
 require 'DBManager.php';
 $db = DBManager::getInstance();
 
@@ -74,13 +74,12 @@ abstract class BaseModel
  
         $fields   = self::getFields();
         $replace  = "REPLACE INTO " . strtolower(get_called_class()) . "(" . implode(',', $fields) . ")";
- 
+
         $function = function ($value) {
             return ':' . $value;
         };
  
         $replace .= " VALUES (" . implode(',', array_map($function, $fields)) . ")";
- 
         $statement = $db->prepare($replace);
  
         foreach ($fields as $field) {
@@ -158,11 +157,9 @@ abstract class BaseModel
      */
     public function update(Array $properties)
     {
-        var_dump($properties);
         foreach ($properties as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->$key = $value;
-                echo "value: " . $key . " , value: " . $value . \n;
             }
         }
         $this->save();

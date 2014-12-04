@@ -6,8 +6,8 @@ class DBManager {
 
    private function PDO_DBConnect(){
      $db_type = 'mysql'; 
-     $db_name = 'trendystatus';
-     $user = 'root' ;    $password = 'admin' ;
+     $db_name = 'TrendyStatus';
+     $user = 'root' ;    $password = 'd3fault!' ;
      $host = 'localhost' ; 
     try {
         $dsn = "$db_type:host=$host;dbname=$db_name"; 

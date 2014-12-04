@@ -1,5 +1,4 @@
 <?php 
-
 require 'BaseModel.php';
 
 class StatusMeta extends BaseModel{
@@ -63,50 +62,30 @@ class Status extends BaseModel{
 
 	}
 
-	public function updateStatus(string $jsonStatus){
+	public function updateStatus($jsonStatus){
 		$statusObj = json_decode($jsonStatus);
-		var_dump($statusObj);
 		$this->update((array)$statusObj);
 
+		return $statusObj;
 	}
 
 	public function deleteStatus(){
-		
-		try {	
-			// StatusMeta::getByStatusID($this->ID);
+
+		try 
+		{	
+			StatusMeta::getByStatusID($this->ID);
 			$meta = StatusMeta::getByStatusID($this->ID);
-			if ($meta !== null && ($meta->StatusID === $this->ID ) {
+			if ($meta !== null && ($meta->StatusID === $this->ID )) {
 				$meta->delete();
 				$this->delete();
 			}
-		} catch (Exception $e) {
-			return '{error: "' . $e . '"}';
+			echo '{message: "success"}';
 		}
-		return '{message: "success"}';
+		catch (Exception $e) {
+			echo '{error: "' . $e . '"}';
+		}
+
 	}
 
 
 }
-
-
-$status = array(
-	'ID' 			=> rand(),
-	'StatusName' 	=> '',
-	'StatusUrl'		=> ''
-);
-
-
-$statusUpdate = array(
-	'StatusName' 	=> 'frig off randy',
-	'StatusUrl'		=> 'http://brazzers.com'
-);
-
-$status = Status::createStatus(json_encode($status));
-var_dump($status);
-$status->updateStatus();
-
-// Status::deleteStatus(26009);
-
-// var_dump($model::create($status));
-
-// var_dump(json_encode($model::getAll()));
