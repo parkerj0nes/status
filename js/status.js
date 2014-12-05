@@ -24,7 +24,8 @@ var status = angular.module('trendyStatus', [])
 
 		var statusEndpoint = 'http://localhost/status/api/';
 
-		function getStatusList(){
+
+		function getStatusList(){			
 			return $http({
 				method: 'GET',
 				url: statusEndpoint + "statuses",
@@ -45,7 +46,6 @@ var status = angular.module('trendyStatus', [])
 			}
 
 			obj.generate = function() {
-			console.log(this);
 			 var ts = this.timestamp.toString();
 			 var parts = ts.split( "" ).reverse();
 			 var id = "";
@@ -64,17 +64,24 @@ var status = angular.module('trendyStatus', [])
 
 		function addStatus(status){
 
-			//this is where we left off
-			// need to add parameters from the status on this side, and then break it apart on the php side
+			var newStatus;
+
 			var statusPromise = $http({
 				method: 'POST',
-				url: statusEndpoint + "statuses",
+				url: statusEndpoint + "status",
 				headers: {
-					'AuthToken' : 'Token dicks'
-				}
+					'AuthToken': 'Token dicks',
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+				data: {
+					"ID": status.ID,
+					"StatusName": status.StatusName,
+					"StatusUrl": status.StatusUrl,
+					"StatusMeta": status.StatusMeta
+					}
 			})
-			statusList.push(status);
-			//save off to a hard list of statuses;
+
+			return statusPromise;
 		}
 		function updateStatus(status){
 			statusList.push(status);
@@ -117,18 +124,17 @@ var status = angular.module('trendyStatus', [])
 	.controller('statusController', ['$scope', 'statusList', 'statusCheck', function($scope, statusList, statusCheck) {
 	  // $scope.name = 'Hola!';
 
-	  $scope.statusList = [
-	  	{
-	  		id: 1, 
-	  		StatusName: "default",
-	  		StatusUrl: "www.com"
-	  	}
-	  ];
+	  $scope.statusList = [];
 
-	  statusList.get().then(function(response){
-	  	console.log(response.data);
-	  	$scope.statusList = response.data;
-	  });
+	  var statusPromise = statusList.get();
+
+	  statusPromise.then(function(response){
+	  			$.each(response.data, function(){
+	  				$scope.statusList.push(this);	
+	  			})
+			}, function(error){
+				alert(error.data);
+			})
 
 	  $scope.newStatus = {
 	  	newStatusName: "Status Name",
@@ -151,11 +157,18 @@ var status = angular.module('trendyStatus', [])
 	  			LastTestTime: null,
 	  			CreationDate: null,
 	  			Description: "default description",
-	  			visibility: $scope.availability
+	  			visibility: $scope.availability[1]
 	  		}
 	  	}
 
-	  	statusList.add(status);
+	  	var statusPromise = statusList.add(status);
+	  	statusPromise.then(function(response){
+	  			// document.write(response.data);
+				$scope.statusList.push(JSON.parse(response.data));
+			}, function(error){
+				console.log(error);
+			})
+
 	  };
 
 	  $scope.removeStatus = function(status){
