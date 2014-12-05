@@ -63,6 +63,16 @@ var status = angular.module('trendyStatus', [])
 
 
 		function addStatus(status){
+
+			//this is where we left off
+			// need to add parameters from the status on this side, and then break it apart on the php side
+			var statusPromise = $http({
+				method: 'POST',
+				url: statusEndpoint + "statuses",
+				headers: {
+					'AuthToken' : 'Token dicks'
+				}
+			})
 			statusList.push(status);
 			//save off to a hard list of statuses;
 		}
@@ -132,17 +142,19 @@ var status = angular.module('trendyStatus', [])
 
 	  $scope.addNewStatus = function(){
 	  	var status = {
-	  		id: statusList.idGenerator.generate(),
-	  		name: $scope.newStatus.newStatusName,
-	  		url: $scope.newStatus.newStatusUrl,
-	  		status: 'warning',
-	  		meta: {
-	  			code: null,
-	  			description: "sdfusdhfasdf;kashdf;asdf s ;dfuhas;dfuhas;dfuhasd fasd ;fasdhfa;sdhfas ;dfh",
+	  		ID: statusList.idGenerator.generate(),
+	  		StatusName: $scope.newStatus.newStatusName,
+	  		StatusUrl: $scope.newStatus.newStatusUrl,
+	  		StatusMeta: {
+	  			ID: statusList.idGenerator.generate(),
+	  			LastResponseCode: null,
+	  			LastTestTime: null,
+	  			CreationDate: null,
+	  			Description: "default description",
 	  			visibility: $scope.availability
-	  		},
-
+	  		}
 	  	}
+
 	  	statusList.add(status);
 	  };
 
