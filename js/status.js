@@ -15,14 +15,56 @@ var status = angular.module('trendyStatus', [])
 	  editor: 'editor',
 	  guest: 'guest'
 	})
-	
+.factory("transformRequestAsFormPost", [function() {
+                // I prepare the request data for the form post.
+                function transformRequest( data, getHeaders ) {
+                    var headers = getHeaders();
+                    headers[ "Content-type" ] = "application/x-www-form-urlencoded; charset=utf-8";
+                    return( serializeData( data ) );
+                }
+                // Return the factory value.
+
+                return( transformRequest );
+                // I serialize the given Object into a key-value pair string. This
+                // method expects an object and will default to the toString() method.
+                // --
+                // NOTE: This is an atered version of the jQuery.param() method which
+                // will serialize a data collection for Form posting.
+                // --
+                // https://github.com/jquery/jquery/blob/master/src/serialize.js#L45
+                function serializeData( data ) {
+                    // If this is not an object, defer to native stringification.
+                    if (!angular.isObject(data)) {
+                        return( ( data == null ) ? "" : data.toString() );
+                    }
+                    var buffer = [];
+                    // Serialize each key in the object.
+                    for ( var name in data ) {
+                        if ( ! data.hasOwnProperty( name ) ) {
+                            continue;
+                        }
+                        var value = data[ name ];
+                        buffer.push(
+                            encodeURIComponent( name ) +
+                            "=" +
+                            encodeURIComponent( ( value == null ) ? "" : value )
+                        );
+                    }
+                    // Serialize the buffer and clean it up for transportation.
+                    var source = buffer
+                        .join( "&" )
+                        .replace( /%20/g, "+" )
+                    ;
+                    return( source );
+                }
+     }])
 	.factory('AuthService', ['$http', 'Session', function($http, Session){
 
 	}])
 
-	.factory('statusList', ['$http', '$q', function($http, $q){
+	.factory('statusList', ['$http', '$q', 'transformRequestAsFormPost', function($http, $q, transformRequestAsFormPost){
 
-		var statusEndpoint = 'http://localhost/status/api/';
+		var statusEndpoint = 'http://localhost:8080/status/api/';
 
 
 		function getStatusList(){			
@@ -69,18 +111,18 @@ var status = angular.module('trendyStatus', [])
 			var statusPromise = $http({
 				method: 'POST',
 				url: statusEndpoint + "status",
+				transformRequest: transformRequestAsFormPost,
 				headers: {
 					'AuthToken': 'Token dicks',
 					'Content-Type': 'application/x-www-form-urlencoded'
 				},
 				data: {
-					"ID": status.ID,
-					"StatusName": status.StatusName,
-					"StatusUrl": status.StatusUrl,
-					"StatusMeta": status.StatusMeta
+					ID: status.ID,
+					StatusName: status.StatusName,
+					StatusUrl: status.StatusUrl,
+					StatusMeta: JSON.stringify(status.StatusMeta)
 					}
 			})
-
 			return statusPromise;
 		}
 		function updateStatus(status){
@@ -88,7 +130,13 @@ var status = angular.module('trendyStatus', [])
 		}
 
 		function removeStatus(statusId){
-			return 0;
+			return $http({
+				method: 'DELETE',
+				url: statusEndpoint + "status/" + statusId,
+				headers: {
+					'AuthToken' : 'Token dicks'
+				}
+			});
 		}
 
 
@@ -112,10 +160,7 @@ var status = angular.module('trendyStatus', [])
 			console.log(status.url);
 			return $http({
 				method: 'GET',
-				url: status.StatusUrl,
-				headers: {
-					'AuthToken' : 'Token dicks'
-				}
+				url: status.StatusUrl
 			})	
 		}
 	}])
@@ -128,19 +173,29 @@ var status = angular.module('trendyStatus', [])
 
 	  var statusPromise = statusList.get();
 
-	  statusPromise.then(function(response){
-	  			$.each(response.data, function(){
-	  				$scope.statusList.push(this);	
-	  			})
-			}, function(error){
-				alert(error.data);
-			})
+	  statusPromise.then(
+	  	function(response){
+	  		$.each(response.data, function(){
+	  			$scope.statusList.push(this);	
+	  		})
+		}, 
+		function(error){
+			console.log(error);
+			alert(error.data);
+		})
 
 	  $scope.newStatus = {
-	  	newStatusName: "Status Name",
-	  	newStatusUrl: "Status URL",
+	  	newStatusName: null,
+	  	newStatusUrl: null,
 	  	availability: ['public', 'private'],
-	  	// defaultAvailability: $scope.newStatus.availability[0]
+	  	StatusMeta: {
+  			ID: null,
+  			LastResponseCode: null,
+  			LastTestTime: null,
+  			CreationDate: null,
+  			Description: null,
+  			Visibility: null
+	  	}
 	  };
 	  $scope.availability = ['public', 'private'];
 
@@ -156,40 +211,66 @@ var status = angular.module('trendyStatus', [])
 	  			LastResponseCode: null,
 	  			LastTestTime: null,
 	  			CreationDate: null,
-	  			Description: "default description",
-	  			visibility: $scope.availability[1]
+	  			Description: $scope.newStatus.StatusMeta.Description,
+	  			Visibility: $scope.selectModel
 	  		}
 	  	}
+	  	var statusResult = $scope.testStatus(status);
+	  	console.log(statusResult);
+	  	if (statusResult == 200) {
+			var statusPromise = statusList.add(status);
+		  	statusPromise.then(
+		  		function(response){
+  					var json = response.data;
+	  				console.log(json);
+					$scope.statusList.push(json);
+				}, 
+				function(error){
+					console.log(error);
+				})	  		
+	  	}else {
+	  		var cnf = confirm("your status URL is returning with an error (status code"+ statusResult +"), are you sure it's correct? Press 'OK' to add it anyway");
+	  		if (cnf) {
+	  			var statusPromise = statusList.add(status);
+			  	statusPromise.then(function(response){
+			  			var json = response.data;
+			  			console.log(json);
+						$scope.statusList.push(json);
+					}, function(error){
+						console.log(error);
+					})
+			}
+	  	}
 
-	  	var statusPromise = statusList.add(status);
-	  	statusPromise.then(function(response){
-	  			// document.write(response.data);
-				$scope.statusList.push(JSON.parse(response.data));
-			}, function(error){
-				console.log(error);
-			})
 
 	  };
 
 	  $scope.removeStatus = function(status){
-	  	console.log(status);
-	  	//use promise / then
-	  	if(statusList.remove(status) == 0){
+	  	var deletePromise = statusList.remove(status.ID);
+	  	deletePromise.then(function(response){
+	  		console.log(response.data);
 		  	var index = $scope.statusList.indexOf(status);
 		  	if (index > -1) {
 		  		$scope.statusList.splice(index, 1);
-		  	};
-	  	};
-
+		  	};	  		
+	  	},function(error){
+	  		console.log(error);
+	  	})
 	  }
 
 	  $scope.testStatus = function(status){
+	  	var statusResult;
+
 	  	console.log('send status ping: ' + status.StatusUrl);
 	  	statusCheck.check(status).then(function(result){
+	  		statusResult = result;
 	  		console.log(result);
 	  	}, function(error){
-	  		console.log(error.config);
+	  		statusResult = error;
+	  		console.log(error);
 	  	});
+
+	  	return statusResult;
 	  }
 
 	}]);

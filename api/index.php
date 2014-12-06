@@ -12,13 +12,17 @@ $app->get('/', function(){
 });
 //get
 
-$app->get('/statuses', function(){
-	echo json_encode(Status::getAll());
+$app->get('/statuses', function() use ($app){
+	$response = $app->response();
+	$response->header('Access-Control-Allow-Origin', '*');
+	$response->write(json_encode(Status::getAllStatus()));
 });
 
 
 $app->get('/status/:id', function($id) use ($app){
-	echo json_encode(Status::get($id));
+	$response = $app->response();
+	$response->header('Access-Control-Allow-Origin', '*');
+	$response->write(json_encode(Status::get($id)));
 }); 
 $app->get('/status/search/:query', function(){
 	echo '{"message": "not yet implemented"}';
@@ -29,22 +33,18 @@ $app->get('/status/search/:query', function(){
 $app->post('/status', function() use ($app){
 	$return = array();
 	$params = $app->request()->post();
-	$data = array_keys($params);
-	echo json_encode($data[0]);
-	die();
-	// $StatusName = ($params['StatusName'] !== null) ? stripslashes((string)$params['StatusName']) : "default";
-	
+	$StatusName = ($params['StatusName'] !== null) ? stripslashes((string)$params['StatusName']) : "default";
 	if ( urlencode(urldecode($params['StatusUrl'])) === $params['StatusUrl']){
 	    $StatusUrl = $params['StatusUrl'];
 	} else {
 	    $StatusUrl = urldecode($params['StatusUrl']);
 	}
 
- 
 	$status = array(
-		'ID' 			=> rand(),
+		'ID' 			=> $params['ID'],
 		'StatusName' 	=> $StatusName,
-		'StatusUrl'		=> $StatusUrl
+		'StatusUrl'		=> $StatusUrl,
+		'StatusMeta'	=> $params['StatusMeta']
 	);
 
 	$status = Status::createStatus(json_encode($status));
@@ -57,7 +57,9 @@ $app->put('/status/:id', function() use ($app){
 });
 
 //delete
-$app->delete('/status/:id', function() use ($app){
-	echo '{"message": "not yet implemented"}';
+$app->delete('/status/:id', function($id) use ($app){
+	$status = Status::get($id);
+	$response = $app->response();
+	$response->write($status->deleteStatus());
 });
 $app->run();

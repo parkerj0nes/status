@@ -40,23 +40,38 @@ class Status extends BaseModel{
 	public function __constructor(){
 	}
 
+	public static function getAllStatus(){
+		$statuses = self::getAll();
+		$statusArray = array();
+
+		foreach ($statuses as $status) {
+			$fetched = new Self((array)$status);
+			$fetchedStatusMeta = StatusMeta::getByStatusID($fetched->ID);
+			$fetched->StatusMeta = $fetchedStatusMeta;
+			$statusArray[] = $fetched;
+		}
+
+		return $statusArray;
+	}
+
 	public static function createStatus($jsonStatus){
 
 		$NewStatus = json_decode($jsonStatus);
+		$sMeta = json_decode($NewStatus->StatusMeta);
+		$visibility = ($sMeta->Visibility == 'private') ? 0 : 1;
 
 		$status = self::create((array)$NewStatus);
 		$statusMeta = array(
-			'ID' 				=> rand(),
+			'ID' 				=> $sMeta->ID,
 			'StatusID' 			=> $NewStatus->ID,
 			'LastResponseCode' 	=> 0,
 			'LastTestTime'		=> date('Y-m-d H:i:s'),
 			'CreationDate'		=> date('Y-m-d H:i:s'),
-			'Description'		=>	'',
-			'Visibility'		=> 3
+			'Description'		=> $sMeta->Description,
+			'Visibility'		=> $visibility
 			);
 
 		$meta = StatusMeta::create((array)$statusMeta);
-
 		$status->StatusMeta = $meta;
 
 		return $status;

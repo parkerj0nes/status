@@ -26,15 +26,13 @@
 						<div class="mask-element mask-buttons pull-left">
 							<button ng-click='removeStatus(status)' class="btn btn-warning">Delete</button>
 							<button ng-click='testStatus(status)' class="btn btn-info">Test</button>
-							<button ng-click='editStatus(status)' type="button" class="btn btn-success">Edit Button</button>					
+							<button ng-click='editStatus(status)' type="button" class="btn btn-success">Edit</button>					
 						</div>
 						<div class="mask-element mask-info pull-left">
-							<p>Description: {{status.meta.description}}</p>
+							<p>Description: {{status.StatusMeta.Description}}</p>
 						</div>
 						<div class="mask-element mask-options pull-left">
-							<select ng-model='selectModel' ng-options="visibility for visibility in availability">
-
-							</select>
+							<span>{{status.StatusMeta.Visibility}}</span>
 						</div>
 						<div class="clearfix"></div>
 					</div>
@@ -53,9 +51,12 @@
 					<form name="addStatus" class="new-status" ng-submit="addNewStatus()">
 						<div class="status-info	edit-labels">
 							<label name="name-label">Name:</label>
-							<input name="status-name" ng-model="newStatus.newStatusName">
+							<input name="status-name" ng-model="newStatus.newStatusName" placeholder="name">
 							<label name="url-label">URL:</label>
-							<input name="status-url" ng-model="newStatus.newStatusUrl">
+							<input name="status-url" ng-model="newStatus.newStatusUrl" placeholder="url">
+							<label name="name-label">Description:</label>
+							<textarea name="status-name" ng-model="newStatus.StatusMeta.Description" rows="4" cols="25" style="resize:none" placeholder="description"></textarea>
+							<select ng-model='selectModel' ng-options="visibility for visibility in availability"></select>
 						</div>
 						<div class="status-info edit-buttons">
 							<button name="save" type="submit" class="btn-success">Save</button>
