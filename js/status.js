@@ -64,7 +64,7 @@ var status = angular.module('trendyStatus', [])
 
 	.factory('statusList', ['$http', '$q', 'transformRequestAsFormPost', function($http, $q, transformRequestAsFormPost){
 
-		var statusEndpoint = 'http://localhost:8080/status/api/';
+		var statusEndpoint = 'http://localhost/status/api/';
 
 
 		function getStatusList(){			
@@ -125,8 +125,22 @@ var status = angular.module('trendyStatus', [])
 			})
 			return statusPromise;
 		}
-		function updateStatus(status){
-			statusList.push(status);
+		function updateStatus(id, newStatus){
+			var statusPromise = $http({
+				method: 'PUT',
+				url: statusEndpoint + "status/" + id,
+				transformRequest: transformRequestAsFormPost,
+				headers: {
+					'AuthToken': 'Token dicks',
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+				data: {
+					StatusName: newStatus.StatusName,
+					StatusUrl: newStatus.StatusUrl,
+					StatusMeta: JSON.stringify(newStatus.StatusMeta)
+					}
+			})
+			return statusPromise;
 		}
 
 		function removeStatus(statusId){
@@ -176,12 +190,15 @@ var status = angular.module('trendyStatus', [])
 	  statusPromise.then(
 	  	function(response){
 	  		$.each(response.data, function(){
+	  			this.editing = false;
+	  			console.log(this);
+	  			$scope.testStatus(this);
 	  			$scope.statusList.push(this);	
 	  		})
 		}, 
 		function(error){
 			console.log(error);
-			alert(error.data);
+			document.write(error.data);
 		})
 
 	  $scope.newStatus = {
@@ -202,6 +219,7 @@ var status = angular.module('trendyStatus', [])
 	  $scope.selectModel = $scope.availability[0];
 
 	  $scope.addNewStatus = function(){
+	  	console.log(this);
 	  	var status = {
 	  		ID: statusList.idGenerator.generate(),
 	  		StatusName: $scope.newStatus.newStatusName,
@@ -216,13 +234,12 @@ var status = angular.module('trendyStatus', [])
 	  		}
 	  	}
 	  	var statusResult = $scope.testStatus(status);
-	  	console.log(statusResult);
 	  	if (statusResult == 200) {
 			var statusPromise = statusList.add(status);
 		  	statusPromise.then(
 		  		function(response){
   					var json = response.data;
-	  				console.log(json);
+	  				json.editing = false;
 					$scope.statusList.push(json);
 				}, 
 				function(error){
@@ -234,7 +251,6 @@ var status = angular.module('trendyStatus', [])
 	  			var statusPromise = statusList.add(status);
 			  	statusPromise.then(function(response){
 			  			var json = response.data;
-			  			console.log(json);
 						$scope.statusList.push(json);
 					}, function(error){
 						console.log(error);
@@ -248,7 +264,6 @@ var status = angular.module('trendyStatus', [])
 	  $scope.removeStatus = function(status){
 	  	var deletePromise = statusList.remove(status.ID);
 	  	deletePromise.then(function(response){
-	  		console.log(response.data);
 		  	var index = $scope.statusList.indexOf(status);
 		  	if (index > -1) {
 		  		$scope.statusList.splice(index, 1);
@@ -258,19 +273,60 @@ var status = angular.module('trendyStatus', [])
 	  	})
 	  }
 
+	  // $scope.edit = false;
+
+	  $scope.editStatus = function(status){
+	  	// console.log(status);
+	  	status.editing = true;	
+	  }
+	  $scope.cancelEdit = function(status){
+		status.editing = false;
+	  }
+
+
+	  $scope.updateStatus = function(status){
+	  	var editStatus = {
+	  		StatusName: status.StatusName,
+	  		StatusUrl: status.StatusUrl,
+	  		StatusMeta: {
+	  			ID: status.StatusMeta.ID,
+	  			LastResponseCode: null,
+	  			LastTestTime: null,
+	  			CreationDate: status.StatusMeta.CreationDate,
+	  			Description: status.StatusMeta.Description,
+	  			Visibility: status.StatusMeta.Visibility
+	  		}
+	  	}
+		var statusPromise = statusList.update(status.ID, editStatus);
+	  	statusPromise.then(
+	  		function(response){
+				var json = response.data;
+			}, 
+			function(error){
+				document.write(error.data);
+			})	
+		status.editing = false;  		
+	  	}
+
 	  $scope.testStatus = function(status){
-	  	var statusResult;
+	  	// var statusResult;
 
 	  	console.log('send status ping: ' + status.StatusUrl);
 	  	statusCheck.check(status).then(function(result){
-	  		statusResult = result;
-	  		console.log(result);
+	  		// statusResult = result;
+	  		// console.log(result);
+			status.status = 'success';
 	  	}, function(error){
-	  		statusResult = error;
-	  		console.log(error);
+	  		// statusResult = error;
+	  		// console.log(error);
+			if(error.status == 404){
+				status.status = 'warning';
+			} else{
+				status.status = 'fail';
+			};
 	  	});
 
-	  	return statusResult;
+	  	// return statusResult;
 	  }
 
 	}]);

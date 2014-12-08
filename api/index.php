@@ -52,14 +52,18 @@ $app->post('/status', function() use ($app){
 });
 
 //put
-$app->put('/status/:id', function() use ($app){
-	echo '{"message": "not yet implemented"}';
+$app->put('/status/:id', function($id) use ($app){
+	$status = Status::get($id);
+	$params = $app->request()->params();
+	$status->updateStatus($params);
+
+	echo json_encode($status);
 });
 
 //delete
 $app->delete('/status/:id', function($id) use ($app){
 	$status = Status::get($id);
 	$response = $app->response();
-	$response->write($status->deleteStatus());
+	echo json_encode($status->deleteStatus());
 });
 $app->run();

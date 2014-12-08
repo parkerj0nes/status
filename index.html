@@ -21,12 +21,12 @@
 	</div>
 		<div class="content container" ng-controller="statusController">
 			<section class="status-section">
-				<article ng-repeat="status in statusList" class="status-item center-block">
-					<div class="mask">
+				<article id="status-{{$index}}"ng-repeat="status in statusList" class="status-item center-block">
+					<div ng-show="!status.editing" class="mask ng-show">
 						<div class="mask-element mask-buttons pull-left">
 							<button ng-click='removeStatus(status)' class="btn btn-warning">Delete</button>
 							<button ng-click='testStatus(status)' class="btn btn-info">Test</button>
-							<button ng-click='editStatus(status)' type="button" class="btn btn-success">Edit</button>					
+							<button ng-click='editStatus(status)' type="button" class="btn btn-success">Edit</button>
 						</div>
 						<div class="mask-element mask-info pull-left">
 							<p>Description: {{status.StatusMeta.Description}}</p>
@@ -36,18 +36,33 @@
 						</div>
 						<div class="clearfix"></div>
 					</div>
-					<div class="status-info pull-left">
+					<div ng-hide="status.editing" class="status-info pull-left ng-show">
 						<label name="name-label">Name:</label>
 						<span>{{status.StatusName}}</span>
 						<label name="url-label">URL:</label>
 						<span>{{status.StatusUrl}}</span>
 					</div>
-					<div class='status-{{status.status}} pull-right'>
+					<div ng-hide="status.editing" class='status-{{status.status}} pull-right'>
 					</div>
-
+					<form ng-show="status.editing" id="edit-status-{{$index}}" name="editStatusForm" class="new-status ng-hide" ng-submit="updateStatus(status)">
+						<div class="status-info	edit-labels">
+							<label name="name-label">Name:</label>
+							<input name="status-name" ng-model="status.StatusName">
+							<label name="url-label">URL:</label>
+							<input name="status-url" ng-model="status.StatusUrl" placeholder="url">
+							<label name="name-label">Description:</label>
+							<textarea name="status-name" ng-model="status.StatusMeta.Description" rows="4" cols="25" style="resize:none" placeholder="description"></textarea>
+							<select ng-model='status.StatusMeta.visibility' ng-options="visibility for visibility in availability"></select>
+						</div>
+						<div class="status-info edit-buttons">
+							<button name="save" type="submit" class="btn btn-success">Save</button>
+							<button name="cancel" type="button" ng-click="cancelEdit(status)" class="btn btn-warn">cancel</button>
+						</div>
+						<div class="clearfix"></div>
+					</form>
 					<div class="clearfix"></div>
 				</article>
-				<article class="edit status-item center-block hide">
+				<article class="add status-item center-block hide">
 					<form name="addStatus" class="new-status" ng-submit="addNewStatus()">
 						<div class="status-info	edit-labels">
 							<label name="name-label">Name:</label>
@@ -85,7 +100,7 @@
 	<script type="text/javascript">
 	$('<div class="add-status"></div>').insertAfter('article:last-child');
 	$('.add-status').click(function(){
-		$('.edit').toggleClass('hide');
+		$('.add').toggleClass('hide');
 	})
 	</script>
 </body>

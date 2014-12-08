@@ -24,8 +24,14 @@ class StatusMeta extends BaseModel{
 	    $statement->execute();
 
 	    $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-	    return new static($result[0]);
+	    
+	    //weird difference between php versions, check the php version being used on the trendy work computer,
+	    //there's some issue here with inaccessible array elements. 
+	    //http://stackoverflow.com/questions/11090328/undefined-offset-while-accessing-array-element-which-exists
+	    foreach ($result as $result) {
+	    	return new static($result);
+	    }
+	    // return new static($result[0]);
 	}
 
 }
@@ -78,24 +84,26 @@ class Status extends BaseModel{
 
 	}
 
-	public function updateStatus($jsonStatus){
-		$statusObj = json_decode($jsonStatus);
-		$this->update((array)$statusObj);
-
-		return $statusObj;
+	public function updateStatus($status){
+		$meta = StatusMeta::getByStatusID($this->ID);
+		$update = json_decode($status['StatusMeta']);
+		$this->update((array)$status);
+		$meta->update((array)$update);
+		// print_r(StatusMeta::getByStatusID($this->ID));
+		// die();
+		// $this->StatusMeta = $meta;
+		// return $this;
 	}
 
 	public function deleteStatus(){
-
 		try 
 		{	
-			StatusMeta::getByStatusID($this->ID);
 			$meta = StatusMeta::getByStatusID($this->ID);
 			if ($meta !== null && ($meta->StatusID === $this->ID )) {
 				$meta->delete();
 				$this->delete();
 			}
-			echo '{message: "success"}';
+			return '{message: "success"}';
 		}
 		catch (Exception $e) {
 			echo '{error: "' . $e . '"}';
